@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Coding Analysis - Recipe Bot</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .content {
+            display: flex;
+            height: 80vh;
+        }
+        .trace-panel {
+            flex: 1;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+        }
+        .annotation-panel {
+            flex: 0 0 400px;
+            padding: 20px;
+            background: #f9f9f9;
+            overflow-y: auto;
+        }
+        .trace-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .trace-query {
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        .trace-response {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .failure-modes {
+            margin: 20px 0;
+        }
+        .failure-mode {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .failure-mode input {
+            margin-right: 10px;
+        }
+        .failure-mode label {
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .notes-section {
+            margin: 20px 0;
+        }
+        .notes-section textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .trace-selector {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .status-indicator {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-annotated {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .export-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Open Coding Analysis - Recipe Bot Traces</h1>
+            <div id="progressInfo">Loading...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="trace-panel">
+                <div class="navigation">
+                    <div>
+                        <button class="btn btn-secondary" id="prevBtn">← Previous</button>
+                        <select class="trace-selector" id="traceSelector">
+                            <option>Loading traces...</option>
+                        </select>
+                        <button class="btn btn-secondary" id="nextBtn">Next →</button>
+                    </div>
+                    <div class="status-indicator" id="statusIndicator">Loading...</div>
+                </div>
+                
+                <div id="traceContent" class="loading">
+                    Loading trace data...
+                </div>
+            </div>
+            
+            <div class="annotation-panel">
+                <h3>Annotation</h3>
+                
+                <div class="failure-modes">
+                    <h4>Failure Modes</h4>
+                    <div id="failureModesList">
+                        Loading failure modes...
+                    </div>
+                </div>
+                
+                <div class="notes-section">
+                    <h4>Open Coding Notes</h4>
+                    <textarea id="openCodeNotes" placeholder="Enter your open coding observations, patterns, and insights here..."></textarea>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" id="saveBtn">Save Annotation</button>
+                    <button class="btn btn-secondary" id="clearBtn">Clear</button>
+                </div>
+                
+                <div class="export-section">
+                    <h4>Export</h4>
+                    <button class="btn btn-success" id="exportBtn">Export to CSV</button>
+                    <small>Download completed annotations as CSV file</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let traces = [];
+        let currentTraceIndex = 0;
+        let annotations = {};
+        let failureModes = [];
+        
+        // Initialize the application
+        async function init() {
+            try {
+                // Load all data
+                await Promise.all([
+                    loadTraces(),
+                    loadAnnotations(), 
+                    loadFailureModes()
+                ]);
+                
+                // Setup UI
+                setupTraceSelector();
+                setupEventListeners();
+                
+                // Load first trace
+                if (traces.length > 0) {
+                    loadTrace(0);
+                }
+                
+                updateProgress();
+                
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                document.getElementById('traceContent').innerHTML = 
+                    '<div class="loading">Error loading data. Please refresh the page.</div>';
+            }
+        }
+        
+        // Load trace data from API
+        async function loadTraces() {
+            const response = await fetch('/api/traces');
+            traces = await response.json();
+        }
+        
+        // Load existing annotations
+        async function loadAnnotations() {
+            const response = await fetch('/api/annotations');
+            annotations = await response.json();
+        }
+        
+        // Load failure modes
+        async function loadFailureModes() {
+            const response = await fetch('/api/failure-modes');
+            failureModes = await response.json();
+            
+            // Populate failure modes checkboxes
+            const container = document.getElementById('failureModesList');
+            container.innerHTML = failureModes.map(mode => `
+                <div class="failure-mode">
+                    <input type="checkbox" id="fm_${mode}" data-mode="${mode}">
+                    <label for="fm_${mode}" title="${getFailureModeDescription(mode)}">
+                        ${formatFailureModeName(mode)}
+                    </label>
+                </div>
+            `).join('');
+        }
+        
+        // Format failure mode name for display
+        function formatFailureModeName(mode) {
+            return mode.split('_').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+        
+        // Get failure mode description (tooltip)
+        function getFailureModeDescription(mode) {
+            const descriptions = {
+                'missing_serving_size': 'Bot fails to specify number of servings or portion sizes',
+                'overcomplicated_simple_recipes': 'Bot provides recipes with too many ingredients or steps for simple dishes',
+                'inconsistent_time_estimates': 'Bot provides recipes that don\'t match requested time constraints',
+                'missing_dietary_restriction_info': 'Bot fails to properly address or verify dietary restrictions',
+                'incomplete_ingredient_substitutions': 'Bot fails to provide alternatives for dietary restrictions',
+                'inconsistent_recipe_formatting': 'Bot provides recipes with inconsistent formatting',
+                'missing_equipment_requirements': 'Bot fails to specify necessary cooking equipment',
+                'inadequate_safety_information': 'Bot fails to provide safety information or temperature guidelines'
+            };
+            return descriptions[mode] || mode;
+        }
+        
+        // Setup trace selector dropdown
+        function setupTraceSelector() {
+            const selector = document.getElementById('traceSelector');
+            selector.innerHTML = traces.map((trace, index) => 
+                `<option value="${index}">${trace.id} - ${trace.query.substring(0, 50)}...</option>`
+            ).join('');
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('prevBtn').addEventListener('click', () => {
+                if (currentTraceIndex > 0) {
+                    loadTrace(currentTraceIndex - 1);
+                }
+            });
+            
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                if (currentTraceIndex < traces.length - 1) {
+                    loadTrace(currentTraceIndex + 1);
+                }
+            });
+            
+            document.getElementById('traceSelector').addEventListener('change', (e) => {
+                loadTrace(parseInt(e.target.value));
+            });
+            
+            document.getElementById('saveBtn').addEventListener('click', saveAnnotation);
+            document.getElementById('clearBtn').addEventListener('click', clearAnnotation);
+            document.getElementById('exportBtn').addEventListener('click', exportCSV);
+        }
+        
+        // Load a specific trace
+        function loadTrace(index) {
+            currentTraceIndex = index;
+            const trace = traces[index];
+            
+            // Update trace content
+            document.getElementById('traceContent').innerHTML = `
+                <div class="trace-info">
+                    <div class="trace-query">Query: ${trace.query}</div>
+                    <div>Trace ID: ${trace.id}</div>
+                </div>
+                <div class="trace-response">${trace.response}</div>
+            `;
+            
+            // Update selector
+            document.getElementById('traceSelector').value = index;
+            
+            // Load existing annotation if it exists
+            loadAnnotationForTrace(trace.id);
+            
+            // Update status indicator
+            updateStatusIndicator(trace.id);
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === traces.length - 1;
+        }
+        
+        // Load annotation for current trace
+        function loadAnnotationForTrace(traceId) {
+            const annotation = annotations[traceId];
+            
+            if (annotation) {
+                // Load failure modes
+                failureModes.forEach(mode => {
+                    const checkbox = document.getElementById(`fm_${mode}`);
+                    if (checkbox) {
+                        checkbox.checked = annotation.failure_modes?.[mode] || false;
+                    }
+                });
+                
+                // Load notes
+                document.getElementById('openCodeNotes').value = annotation.open_code_notes || '';
+            } else {
+                clearAnnotation();
+            }
+        }
+        
+        // Clear annotation form
+        function clearAnnotation() {
+            // Clear failure modes
+            failureModes.forEach(mode => {
+                const checkbox = document.getElementById(`fm_${mode}`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+            });
+            
+            // Clear notes
+            document.getElementById('openCodeNotes').value = '';
+        }
+        
+        // Save annotation
+        async function saveAnnotation() {
+            const trace = traces[currentTraceIndex];
+            const failureModesData = {};
+            
+            // Collect failure modes
+            failureModes.forEach(mode => {
+                const checkbox = document.getElementById(`fm_${mode}`);
+                if (checkbox) {
+                    failureModesData[mode] = checkbox.checked;
+                }
+            });
+            
+            const annotationData = {
+                trace_id: trace.id,
+                open_code_notes: document.getElementById('openCodeNotes').value,
+                failure_modes: failureModesData
+            };
+            
+            try {
+                const response = await fetch('/api/annotations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(annotationData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update local annotations
+                    annotations[trace.id] = {
+                        open_code_notes: annotationData.open_code_notes,
+                        failure_modes: annotationData.failure_modes
+                    };
+                    
+                    // Update UI
+                    updateStatusIndicator(trace.id);
+                    updateProgress();
+                    
+                    // Show success (you could add a toast notification here)
+                    document.getElementById('saveBtn').textContent = 'Saved!';
+                    setTimeout(() => {
+                        document.getElementById('saveBtn').textContent = 'Save Annotation';
+                    }, 2000);
+                } else {
+                    alert('Error saving annotation: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error saving annotation:', error);
+                alert('Error saving annotation. Please try again.');
+            }
+        }
+        
+        // Update status indicator
+        function updateStatusIndicator(traceId) {
+            const indicator = document.getElementById('statusIndicator');
+            const isAnnotated = annotations[traceId];
+            
+            if (isAnnotated) {
+                indicator.textContent = 'Annotated';
+                indicator.className = 'status-indicator status-annotated';
+            } else {
+                indicator.textContent = 'Pending';
+                indicator.className = 'status-indicator status-pending';
+            }
+        }
+        
+        // Update progress bar
+        async function updateProgress() {
+            try {
+                const response = await fetch('/api/progress');
+                const progress = await response.json();
+                
+                document.getElementById('progressInfo').textContent = 
+                    `${progress.completed} of ${progress.total} traces annotated (${progress.percentage}%)`;
+                
+                document.getElementById('progressFill').style.width = `${progress.percentage}%`;
+            } catch (error) {
+                console.error('Error updating progress:', error);
+            }
+        }
+        
+        // Export to CSV
+        function exportCSV() {
+            window.open('/api/export-csv', '_blank');
+        }
+        
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
