@@ -541,11 +541,11 @@
         <div class="content-area">
             <div class="content-header">
                 <div class="nav-controls">
-                    <button class="nav-btn" id="prevBtn">
+                    <button class="nav-btn" id="prevBtn" title="Previous (←, h, k)">
                         <i data-lucide="chevron-left"></i>
                         Previous
                     </button>
-                    <button class="nav-btn" id="nextBtn">
+                    <button class="nav-btn" id="nextBtn" title="Next (→, l, j)">
                         Next
                         <i data-lucide="chevron-right"></i>
                     </button>
@@ -596,32 +596,18 @@
                 <div class="section-header">Quick Assessment</div>
                 <div class="section-content">
                     <div class="quick-actions">
-                        <button class="quick-btn approve" id="approveBtn">
+                        <button class="quick-btn approve" id="approveBtn" title="Approve (1)">
                             <i data-lucide="check"></i>
                             Approve
                         </button>
-                        <button class="quick-btn review" id="reviewBtn">
+                        <button class="quick-btn review" id="reviewBtn" title="Needs Review (2)">
                             <i data-lucide="alert-triangle"></i>
                             Needs Review
                         </button>
-                        <button class="quick-btn reject" id="rejectBtn">
+                        <button class="quick-btn reject" id="rejectBtn" title="Reject (3)">
                             <i data-lucide="x"></i>
                             Reject
                         </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pattern Identification -->
-            <div class="sidebar-section">
-                <div class="section-header">Pattern Identification</div>
-                <div class="section-content">
-                    <button class="add-code-btn">
-                        <i data-lucide="plus"></i>
-                        Add Code
-                    </button>
-                    <div class="pattern-list" id="patternList">
-                        Loading patterns...
                     </div>
                 </div>
             </div>
@@ -638,6 +624,20 @@
                     <div class="auto-save">
                         <i data-lucide="save"></i>
                         Auto-save enabled
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pattern Identification -->
+            <div class="sidebar-section">
+                <div class="section-header">Pattern Identification</div>
+                <div class="section-content">
+                    <button class="add-code-btn">
+                        <i data-lucide="plus"></i>
+                        Add Code
+                    </button>
+                    <div class="pattern-list" id="patternList">
+                        Loading patterns...
                     </div>
                 </div>
             </div>
@@ -789,6 +789,64 @@
             
             // Auto-save on notes change
             document.getElementById('openCodeNotes').addEventListener('input', debounce(saveAnnotation, 1000));
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+        }
+        
+        // Handle keyboard shortcuts
+        function handleKeyboardShortcuts(event) {
+            // Don't trigger shortcuts when typing in textarea or input fields
+            if (event.target.tagName === 'TEXTAREA' || event.target.tagName === 'INPUT') {
+                return;
+            }
+            
+            switch(event.key) {
+                case 'ArrowLeft':
+                case 'h':
+                    event.preventDefault();
+                    if (currentTraceIndex > 0) {
+                        loadTrace(currentTraceIndex - 1);
+                    }
+                    break;
+                    
+                case 'ArrowRight':
+                case 'l':
+                    event.preventDefault();
+                    if (currentTraceIndex < traces.length - 1) {
+                        loadTrace(currentTraceIndex + 1);
+                    }
+                    break;
+                    
+                case 'j':
+                    event.preventDefault();
+                    if (currentTraceIndex < traces.length - 1) {
+                        loadTrace(currentTraceIndex + 1);
+                    }
+                    break;
+                    
+                case 'k':
+                    event.preventDefault();
+                    if (currentTraceIndex > 0) {
+                        loadTrace(currentTraceIndex - 1);
+                    }
+                    break;
+                    
+                case '1':
+                    event.preventDefault();
+                    setQuickAssessment('approve');
+                    break;
+                    
+                case '2':
+                    event.preventDefault();
+                    setQuickAssessment('review');
+                    break;
+                    
+                case '3':
+                    event.preventDefault();
+                    setQuickAssessment('reject');
+                    break;
+            }
         }
         
         // Set quick assessment
