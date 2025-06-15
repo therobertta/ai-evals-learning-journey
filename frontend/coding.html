@@ -72,7 +72,33 @@
             border: 1px solid #ddd;
             max-height: 400px;
             overflow-y: auto;
-            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+        .trace-response h1, .trace-response h2, .trace-response h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .trace-response h1 { font-size: 1.5em; }
+        .trace-response h2 { font-size: 1.3em; }
+        .trace-response h3 { font-size: 1.1em; }
+        .trace-response ul, .trace-response ol {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        .trace-response li {
+            margin: 5px 0;
+        }
+        .trace-response p {
+            margin: 10px 0;
+        }
+        .trace-response strong {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .trace-response em {
+            font-style: italic;
+            color: #666;
         }
         .failure-modes {
             margin: 20px 0;
@@ -230,6 +256,9 @@
         </div>
     </div>
 
+    <!-- Add marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <script>
         // Global state
         let traces = [];
@@ -352,13 +381,19 @@
             currentTraceIndex = index;
             const trace = traces[index];
             
+            // Escape HTML in query to prevent XSS
+            const escapedQuery = trace.query.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            // Parse Markdown response
+            const renderedResponse = marked.parse(trace.response);
+            
             // Update trace content
             document.getElementById('traceContent').innerHTML = `
                 <div class="trace-info">
-                    <div class="trace-query">Query: ${trace.query}</div>
+                    <div class="trace-query">Query: ${escapedQuery}</div>
                     <div>Trace ID: ${trace.id}</div>
                 </div>
-                <div class="trace-response">${trace.response}</div>
+                <div class="trace-response">${renderedResponse}</div>
             `;
             
             // Update selector
