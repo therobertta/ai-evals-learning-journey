@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Coding Interface</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --primary: #0070f3;
+            --primary-hover: #0060df;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 16px 24px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .session-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        .progress-info {
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: #ecfdf5;
+            color: var(--success);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Main Layout */
+        .main-container {
+            margin-top: 80px;
+            padding: 24px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Content Area */
+        .content-area {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .content-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--gray-300);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--gray-700);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            border-color: var(--gray-400);
+            background: var(--gray-50);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .item-info {
+            font-size: 14px;
+            color: var(--gray-600);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-id {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: var(--gray-100);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .content-body {
+            padding: 24px;
+        }
+
+        .analysis-card {
+            margin-bottom: 24px;
+        }
+
+        .analysis-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .analysis-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .type-badge {
+            background: #ede9fe;
+            color: #7c3aed;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .analysis-description {
+            color: var(--gray-600);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .query-section {
+            margin-bottom: 20px;
+        }
+
+        .query-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .query-text {
+            background: var(--gray-50);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            font-style: italic;
+        }
+
+        .response-section {
+            margin-bottom: 20px;
+        }
+
+        .response-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: var(--gray-700);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .response-content {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 660px;
+            overflow-y: auto;
+        }
+
+        .response-content h1,
+        .response-content h2,
+        .response-content h3 {
+            color: var(--gray-900);
+            margin: 16px 0 8px 0;
+            font-weight: 600;
+        }
+
+        .response-content h1 { font-size: 1.25rem; }
+        .response-content h2 { font-size: 1.125rem; }
+        .response-content h3 { font-size: 1rem; }
+
+        .response-content p {
+            margin: 12px 0;
+            color: var(--gray-700);
+        }
+
+        .response-content ul,
+        .response-content ol {
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+
+        .response-content li {
+            margin: 4px 0;
+            color: var(--gray-700);
+        }
+
+        .response-content strong {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.3s ease-out 0.1s both;
+        }
+
+        .sidebar-section {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        /* Quick Assessment */
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quick-btn {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-300);
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-btn.approve {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .quick-btn.approve:hover,
+        .quick-btn.approve.active {
+            background: var(--success);
+            color: white;
+        }
+
+        .quick-btn.review {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .quick-btn.review:hover,
+        .quick-btn.review.active {
+            background: var(--warning);
+            color: white;
+        }
+
+        .quick-btn.reject {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .quick-btn.reject:hover,
+        .quick-btn.reject.active {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Pattern Identification */
+        .add-code-btn {
+            color: var(--primary);
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .add-code-btn:hover {
+            color: var(--primary-hover);
+        }
+
+        .pattern-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pattern-item {
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 12px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .pattern-item:hover {
+            border-color: var(--gray-300);
+        }
+
+        .pattern-item.checked {
+            border-color: var(--primary);
+            background: #f0f9ff;
+        }
+
+        .pattern-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .pattern-checkbox input[type="checkbox"] {
+            margin-top: 2px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+
+        .pattern-label {
+            flex: 1;
+        }
+
+        .pattern-title {
+            font-weight: 500;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .pattern-description {
+            font-size: 12px;
+            color: var(--gray-600);
+            line-height: 1.4;
+        }
+
+        /* Notes Section */
+        .notes-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.2s ease;
+        }
+
+        .notes-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .notes-textarea::placeholder {
+            color: var(--gray-400);
+        }
+
+        .auto-save {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray-500);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 16px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+            
+            .header-right {
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <i data-lucide="code"></i>
+                Open Coding Interface
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="session-info">
+                <i data-lucide="clock"></i>
+                Session: <span id="sessionTime">0h 0m</span>
+            </div>
+            <div class="progress-info" id="progressInfo">
+                0/250
+            </div>
+            <div class="status-badge">
+                <i data-lucide="circle"></i>
+                Active
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="content-header">
+                <div class="nav-controls">
+                    <button class="nav-btn" id="prevBtn" title="Previous (←, h, k)">
+                        <i data-lucide="chevron-left"></i>
+                        Previous
+                    </button>
+                    <button class="nav-btn" id="nextBtn" title="Next (→, l, j)">
+                        Next
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                </div>
+                <div class="item-info">
+                    Item <span id="currentItem">1</span> of <span id="totalItems">250</span>
+                    <span class="item-id" id="currentId">Loading...</span>
+                </div>
+            </div>
+            
+            <div class="content-body">
+                <div class="analysis-card">
+                    <div class="analysis-header">
+                        <h2 class="analysis-title">AI Response Analysis</h2>
+                        <span class="type-badge">Recipe Bot</span>
+                    </div>
+                    <p class="analysis-description">
+                        Evaluate the following AI-generated response for patterns and issues
+                    </p>
+                    
+                    <div class="query-section">
+                        <div class="query-label">
+                            <i data-lucide="user"></i>
+                            User Query
+                        </div>
+                        <div class="query-text" id="queryText">
+                            Loading query...
+                        </div>
+                    </div>
+                    
+                    <div class="response-section">
+                        <div class="response-label">
+                            <i data-lucide="bot"></i>
+                            AI Response
+                        </div>
+                        <div class="response-content" id="responseContent">
+                            <div class="loading">Loading trace data...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Quick Assessment -->
+            <div class="sidebar-section">
+                <div class="section-header">Quick Assessment</div>
+                <div class="section-content">
+                    <div class="quick-actions">
+                        <button class="quick-btn approve" id="approveBtn" title="Approve (1)">
+                            <i data-lucide="check"></i>
+                            Approve
+                        </button>
+                        <button class="quick-btn review" id="reviewBtn" title="Needs Review (2)">
+                            <i data-lucide="alert-triangle"></i>
+                            Needs Review
+                        </button>
+                        <button class="quick-btn reject" id="rejectBtn" title="Reject (3)">
+                            <i data-lucide="x"></i>
+                            Reject
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Open Coding Notes -->
+            <div class="sidebar-section">
+                <div class="section-header">Open Coding Notes</div>
+                <div class="section-content">
+                    <textarea 
+                        class="notes-textarea" 
+                        id="openCodeNotes"
+                        placeholder="Document patterns, themes, and insights you observe in this response..."
+                    ></textarea>
+                    <div class="auto-save">
+                        <i data-lucide="save"></i>
+                        Auto-save enabled
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pattern Identification -->
+            <div class="sidebar-section">
+                <div class="section-header">Pattern Identification</div>
+                <div class="section-content">
+                    <button class="add-code-btn">
+                        <i data-lucide="plus"></i>
+                        Add Code
+                    </button>
+                    <div class="pattern-list" id="patternList">
+                        Loading patterns...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <script>
+        // Global state
+        let traces = [];
+        let currentTraceIndex = 0;
+        let annotations = {};
+        let failureModes = [];
+        let sessionStartTime = Date.now();
+        let quickAssessment = null;
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Initialize the application
+        async function init() {
+            try {
+                // Load all data
+                await Promise.all([
+                    loadTraces(),
+                    loadAnnotations(), 
+                    loadFailureModes()
+                ]);
+                
+                // Setup UI
+                setupEventListeners();
+                setupSessionTimer();
+                
+                // Load first trace
+                if (traces.length > 0) {
+                    loadTrace(0);
+                }
+                
+                updateProgress();
+                
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                document.getElementById('responseContent').innerHTML = 
+                    '<div class="loading">Error loading data. Please refresh the page.</div>';
+            }
+        }
+        
+        // Load trace data from API
+        async function loadTraces() {
+            const response = await fetch('/api/traces');
+            traces = await response.json();
+        }
+        
+        // Load existing annotations
+        async function loadAnnotations() {
+            const response = await fetch('/api/annotations');
+            annotations = await response.json();
+        }
+        
+        // Load failure modes
+        async function loadFailureModes() {
+            const response = await fetch('/api/failure-modes');
+            failureModes = await response.json();
+            
+            // Populate pattern list
+            const container = document.getElementById('patternList');
+            container.innerHTML = failureModes.map(mode => `
+                <div class="pattern-item" onclick="togglePattern('${mode}')">
+                    <div class="pattern-checkbox">
+                        <input type="checkbox" id="fm_${mode}" data-mode="${mode}">
+                        <div class="pattern-label">
+                            <div class="pattern-title">${formatFailureModeName(mode)}</div>
+                            <div class="pattern-description">${getFailureModeDescription(mode)}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Toggle pattern selection
+        function togglePattern(mode) {
+            const checkbox = document.getElementById(`fm_${mode}`);
+            const container = checkbox.closest('.pattern-item');
+            
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                container.classList.add('checked');
+            } else {
+                container.classList.remove('checked');
+            }
+            
+            // Auto-save
+            saveAnnotation();
+        }
+        
+        // Format failure mode name for display
+        function formatFailureModeName(mode) {
+            return mode.split('_').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+        
+        // Get failure mode description (tooltip)
+        function getFailureModeDescription(mode) {
+            const descriptions = {
+                'missing_serving_size': 'Bot fails to specify number of servings or portion sizes',
+                'overcomplicated_simple_recipes': 'Bot provides recipes with too many ingredients or steps for simple dishes',
+                'inconsistent_time_estimates': 'Bot provides recipes that don\'t match requested time constraints',
+                'missing_dietary_restriction_info': 'Bot fails to properly address or verify dietary restrictions',
+                'incomplete_ingredient_substitutions': 'Bot fails to provide alternatives for dietary restrictions',
+                'inconsistent_recipe_formatting': 'Bot provides recipes with inconsistent formatting',
+                'missing_equipment_requirements': 'Bot fails to specify necessary cooking equipment',
+                'inadequate_safety_information': 'Bot fails to provide safety information or temperature guidelines'
+            };
+            return descriptions[mode] || mode;
+        }
+        
+        // Setup session timer
+        function setupSessionTimer() {
+            setInterval(() => {
+                const elapsed = Date.now() - sessionStartTime;
+                const hours = Math.floor(elapsed / 3600000);
+                const minutes = Math.floor((elapsed % 3600000) / 60000);
+                document.getElementById('sessionTime').textContent = `${hours}h ${minutes}m`;
+            }, 1000);
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('prevBtn').addEventListener('click', () => {
+                if (currentTraceIndex > 0) {
+                    loadTrace(currentTraceIndex - 1);
+                }
+            });
+            
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                if (currentTraceIndex < traces.length - 1) {
+                    loadTrace(currentTraceIndex + 1);
+                }
+            });
+            
+            // Quick assessment buttons
+            document.getElementById('approveBtn').addEventListener('click', () => setQuickAssessment('approve'));
+            document.getElementById('reviewBtn').addEventListener('click', () => setQuickAssessment('review'));
+            document.getElementById('rejectBtn').addEventListener('click', () => setQuickAssessment('reject'));
+            
+            // Auto-save on notes change
+            document.getElementById('openCodeNotes').addEventListener('input', debounce(saveAnnotation, 1000));
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+        }
+        
+        // Handle keyboard shortcuts
+        function handleKeyboardShortcuts(event) {
+            // Don't trigger shortcuts when typing in textarea or input fields
+            if (event.target.tagName === 'TEXTAREA' || event.target.tagName === 'INPUT') {
+                return;
+            }
+            
+            switch(event.key) {
+                case 'ArrowLeft':
+                case 'h':
+                    event.preventDefault();
+                    if (currentTraceIndex > 0) {
+                        loadTrace(currentTraceIndex - 1);
+                    }
+                    break;
+                    
+                case 'ArrowRight':
+                case 'l':
+                    event.preventDefault();
+                    if (currentTraceIndex < traces.length - 1) {
+                        loadTrace(currentTraceIndex + 1);
+                    }
+                    break;
+                    
+                case 'j':
+                    event.preventDefault();
+                    if (currentTraceIndex < traces.length - 1) {
+                        loadTrace(currentTraceIndex + 1);
+                    }
+                    break;
+                    
+                case 'k':
+                    event.preventDefault();
+                    if (currentTraceIndex > 0) {
+                        loadTrace(currentTraceIndex - 1);
+                    }
+                    break;
+                    
+                case '1':
+                    event.preventDefault();
+                    setQuickAssessment('approve');
+                    break;
+                    
+                case '2':
+                    event.preventDefault();
+                    setQuickAssessment('review');
+                    break;
+                    
+                case '3':
+                    event.preventDefault();
+                    setQuickAssessment('reject');
+                    break;
+            }
+        }
+        
+        // Set quick assessment
+        function setQuickAssessment(type) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to selected button
+            document.getElementById(type + 'Btn').classList.add('active');
+            
+            quickAssessment = type;
+            saveAnnotation();
+        }
+        
+        // Debounce function for auto-save
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // Load a specific trace
+        function loadTrace(index) {
+            currentTraceIndex = index;
+            const trace = traces[index];
+            
+            // Escape HTML in query to prevent XSS
+            const escapedQuery = trace.query.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            // Parse Markdown response
+            const renderedResponse = marked.parse(trace.response);
+            
+            // Update UI elements
+            document.getElementById('currentItem').textContent = index + 1;
+            document.getElementById('totalItems').textContent = traces.length;
+            document.getElementById('currentId').textContent = trace.id;
+            document.getElementById('queryText').textContent = trace.query;
+            document.getElementById('responseContent').innerHTML = renderedResponse;
+            
+            // Load existing annotation if it exists
+            loadAnnotationForTrace(trace.id);
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === traces.length - 1;
+            
+            // Re-initialize Lucide icons for any new content
+            lucide.createIcons();
+        }
+        
+        // Load annotation for current trace
+        function loadAnnotationForTrace(traceId) {
+            const annotation = annotations[traceId];
+            
+            if (annotation) {
+                // Load failure modes
+                failureModes.forEach(mode => {
+                    const checkbox = document.getElementById(`fm_${mode}`);
+                    const container = checkbox.closest('.pattern-item');
+                    if (checkbox) {
+                        checkbox.checked = annotation.failure_modes?.[mode] || false;
+                        if (checkbox.checked) {
+                            container.classList.add('checked');
+                        } else {
+                            container.classList.remove('checked');
+                        }
+                    }
+                });
+                
+                // Load notes
+                document.getElementById('openCodeNotes').value = annotation.open_code_notes || '';
+                
+                // Load quick assessment
+                if (annotation.quick_assessment) {
+                    setQuickAssessment(annotation.quick_assessment);
+                } else {
+                    clearQuickAssessment();
+                }
+            } else {
+                clearAnnotation();
+            }
+        }
+        
+        // Clear annotation form
+        function clearAnnotation() {
+            // Clear failure modes
+            failureModes.forEach(mode => {
+                const checkbox = document.getElementById(`fm_${mode}`);
+                const container = checkbox.closest('.pattern-item');
+                if (checkbox) {
+                    checkbox.checked = false;
+                    container.classList.remove('checked');
+                }
+            });
+            
+            // Clear notes
+            document.getElementById('openCodeNotes').value = '';
+            
+            // Clear quick assessment
+            clearQuickAssessment();
+        }
+        
+        // Clear quick assessment
+        function clearQuickAssessment() {
+            document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
+            quickAssessment = null;
+        }
+        
+        // Save annotation
+        async function saveAnnotation() {
+            if (!traces[currentTraceIndex]) return;
+            
+            const trace = traces[currentTraceIndex];
+            const failureModesData = {};
+            
+            // Collect failure modes
+            failureModes.forEach(mode => {
+                const checkbox = document.getElementById(`fm_${mode}`);
+                if (checkbox) {
+                    failureModesData[mode] = checkbox.checked;
+                }
+            });
+            
+            const annotationData = {
+                trace_id: trace.id,
+                open_code_notes: document.getElementById('openCodeNotes').value,
+                failure_modes: failureModesData,
+                quick_assessment: quickAssessment
+            };
+            
+            try {
+                const response = await fetch('/api/annotations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(annotationData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update local annotations
+                    annotations[trace.id] = {
+                        open_code_notes: annotationData.open_code_notes,
+                        failure_modes: annotationData.failure_modes,
+                        quick_assessment: annotationData.quick_assessment
+                    };
+                    
+                    // Update progress
+                    updateProgress();
+                    
+                    // Brief visual feedback
+                    showAutoSaveFeedback();
+                }
+            } catch (error) {
+                console.error('Error saving annotation:', error);
+            }
+        }
+        
+        // Show auto-save feedback
+        function showAutoSaveFeedback() {
+            const autoSaveElement = document.querySelector('.auto-save');
+            autoSaveElement.style.color = 'var(--success)';
+            setTimeout(() => {
+                autoSaveElement.style.color = 'var(--gray-500)';
+            }, 1000);
+        }
+        
+        // Update progress bar
+        async function updateProgress() {
+            try {
+                const response = await fetch('/api/progress');
+                const progress = await response.json();
+                
+                document.getElementById('progressInfo').textContent = 
+                    `${progress.completed}/${progress.total}`;
+            } catch (error) {
+                console.error('Error updating progress:', error);
+            }
+        }
+        
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
